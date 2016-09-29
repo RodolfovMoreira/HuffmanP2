@@ -3,6 +3,6 @@
 
 typedef struct Hashtable Hashtable;
 
-Hashtable* create_hashtable();
+Hashtable* create_hashtable(); // Cria hashtable
 
 #endif /* HUFFMANHASHTABLE_H_ */
