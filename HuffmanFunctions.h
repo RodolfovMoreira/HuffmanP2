@@ -9,9 +9,9 @@ int is_bit_set(unsigned char bits, int position);
 
 int set_bit(unsigned char bits, int position);
 
-Character* new_character(int *bytes, int index); // 'Estufa' os bits no unsigned char
-
 Q_Node* create_queue();
+
+Character* new_character(int *bytes, int index); // 'Estufa' os bits no unsigned char
 
 Q_Node* enqueue(Q_Node* queue, unsigned char item);
 

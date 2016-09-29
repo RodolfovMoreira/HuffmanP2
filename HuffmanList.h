@@ -14,8 +14,6 @@ Node* create_linked_list();
 
 Node* insert_item(Node *node, unsigned char item, int priority);
 
-void print_linked_list(Node *first);
-
 void bubble_sort(Node *first);
 
 void print_pre_order(Node *tree, FILE *printing);
