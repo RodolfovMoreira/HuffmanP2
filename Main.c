@@ -5,6 +5,7 @@
 typedef struct Node{
 	unsigned char item;
 	int priority;
+	int flag;
 	struct Node *next_node;
 	struct Node *previous_node;
 	struct Node *left;
@@ -13,6 +14,7 @@ typedef struct Node{
 
 typedef struct Q_Node{
 	unsigned char item;
+	int remain;
 	struct Q_Node *next_qnode;
 }Q_Node;
 
@@ -21,9 +23,8 @@ typedef struct Character{
 	int size;
 }Character;
 
-typedef struct Hashtable
-{
-	Character *table[256];
+typedef struct Hashtable{
+	Character *table[257];
 }Hashtable;
 
 int is_bit_set(unsigned char bits, int position)
@@ -43,9 +44,7 @@ Character* new_character(int *bytes, int index) // ARMAZENA OS BITS EM CADA CASA
 	Character *new_character = (Character*) malloc(sizeof(Character));
 	new_character -> bits = 0; // SETA OS BITS DO CHAR EM ZERO //
 
-	int i = 0;
-
-	for(i = 0; i < index; i++) // RODA UM LOOP ATÉ A CASA ATUAL DO ARRAY BYTES //
+	for(int i = 0; i < index; i++) // RODA UM LOOP ATÉ A CASA ATUAL DO ARRAY BYTES //
 	{
 		if(bytes[i] == 1) // SE FOR 1, SETA O BIT //
 		{
@@ -62,8 +61,7 @@ Hashtable* create_hashtable() // FUNÇÃO PARA CRIAR HASHTABLE QUE ARMAZENA OS B
 {
 	Hashtable *ht = (Hashtable*) malloc(sizeof(Hashtable));
 
-	int i;
-	for(i = 0; i < 256; i++)
+	for(int i = 0; i < 257; i++)
 	{
 		ht -> table[i] = NULL;
 	}
@@ -84,6 +82,18 @@ Node* insert_item(Node *node, unsigned char item, int priority) // FUNÇÃO DE C
 	Node *newnode = (Node*) malloc(sizeof(Node)); // ALOCAR ESPAÇO DE TAMANHO REFERENTE AO DADO NODE NA MEMÓRIA PARA O NOVO NÓ //
 	newnode -> item = item; // SETAR O VALOR DO ITEM NA CAMADA ITEM DO NOVO NÓ //
 	newnode -> priority = priority;
+	newnode -> flag = 0;
+
+	if(item == '\\')
+	{
+		newnode -> flag = 1; // MARCA O CHAR DE ESCAPE PARA DIFERENCIAR NA IMPRESSAO
+	}
+
+	else if(item == '*')
+	{
+		newnode -> item = '\\'; // CHAR DE ESCAPE PARA DIFERENCIAR DO ASTERISCO DA ÁRVORE
+	}
+
 	newnode -> next_node = node; // SETAR O PONTEIRO NEXTNODE DO NOVO NÓ PARA O NÓ ANTERIOR A ELE //
 	newnode -> previous_node = NULL;
 
@@ -94,6 +104,7 @@ Node* insert_item(Node *node, unsigned char item, int priority) // FUNÇÃO DE C
 
 	newnode -> left = NULL; // PREPARA ESTRUTURAS DA ÁRVORE //
 	newnode -> right = NULL;
+
 	return newnode;
 }
 
@@ -101,6 +112,7 @@ Q_Node* enqueue(Q_Node* queue, unsigned char item)
 {
 	Q_Node* newqnode = (Q_Node*) malloc(sizeof(Q_Node));
 	newqnode -> item = item;
+	newqnode -> remain = 0;
 
 	if(queue == NULL) //SE A FILA ESTIVER VAZIA, ADICIONA NA CABEÇA
 	{
@@ -123,19 +135,10 @@ Q_Node* enqueue(Q_Node* queue, unsigned char item)
 	return queue;
 }
 
-void print_linked_list(Node *first) // IMPRIMIR O CONTEUDO DA LISTA //
-{
-	if(first != NULL)
-	{
-		printf("%u %d\n", first -> item, first -> priority);
-		print_linked_list(first -> next_node); // CHAMAR RECURSIVAMENTE A FUNÇÃO PRINT ENQUANDO P NÃO APONTAR PARA NULO //
-	}
-}
-
 void bubble_sort(Node *first)
 {
 	char aux_item;
-	int aux_priority;
+	int aux_priority, aux_flag;
 
 	Node *hold;
 	Node *current;
@@ -148,10 +151,13 @@ void bubble_sort(Node *first)
 			{
 				aux_item = hold -> item;
 				aux_priority = hold -> priority;
+				aux_flag = hold -> flag;
 				hold -> item = current -> item;
 				hold -> priority = current -> priority;
+				hold -> flag = current -> flag;
 				current -> item = aux_item;
 				current -> priority = aux_priority;
+				current -> flag = aux_flag;
 			}
 		}
 	}
@@ -191,6 +197,7 @@ Node* merge_nodes(Node *first)
 
 	root -> item = '*'; // CHAR DE REPRESENTAÇÃO //
 	root -> priority = (first -> priority + first -> next_node -> priority); // SOMA AS PRIORIDADES DOS DOIS MENORES //
+	root -> flag = 0;
 	root -> next_node = NULL;
 	root -> previous_node = NULL;
 
@@ -206,8 +213,6 @@ Node* merge_nodes(Node *first)
 	root -> left -> previous_node = NULL;
 	root -> right -> next_node = NULL;
 	root -> right -> previous_node = NULL;
-
-	root = sort_tree(root); // FUNÇÃO DE REORDENAÇÃO //
 
 	return root; // RETORNA A RAIZ PARA O FIRST NA MAIN //
 }
@@ -234,7 +239,11 @@ void print_pre_order(Node *tree, FILE *printing)
 	if(tree != NULL)
 	{
 		fprintf(printing, "%u", tree->item); // IMPRIME CADA UNSIGNED DA ARVORE NO ARQUIVO DE SAIDA
-		fprintf(printing, "\n");
+
+		if(tree->flag) // SE A FLAG ESTIVER SETADA (ESCAPE DO CONTRA BARRA) IMPRIME NOVAMENTE PARA DIFERENCIAR NA DESCOMPRESSAO (MONTAGEM DA ÁRVORE)
+		{
+			fprintf(printing, "%u", tree->item);
+		}
 
 		if(tree->left != NULL)
 		{
@@ -254,7 +263,15 @@ void codify(Node *tree, Hashtable *ht, int *byte, int i)
 	{
 		if(tree->item != '*')
 		{
-			ht->table[tree->item] = new_character(byte, i); // GUARDA OS BITS DO CARACTERE ATUAL ARMAZENADOS EM "BYTE" //
+			if(tree->flag) // SE FOR O NODE QUE CONTEM O ESCAPE '\\' (FLAG SETADA) ADICIONA SEU CODIGO NO ESPAÇO EXTRA DA HASH
+			{
+				ht->table[256] = new_character(byte, i); // GUARDA OS BITS DO CARACTERE ATUAL ARMAZENADOS EM "BYTE" //
+			}
+
+			else
+			{
+				ht->table[tree->item] = new_character(byte, i); // GUARDA OS BITS DO CARACTERE ATUAL ARMAZENADOS EM "BYTE" //
+			}
 		}
 
 		if(tree->left != NULL)
@@ -275,12 +292,12 @@ void codify(Node *tree, Hashtable *ht, int *byte, int i)
 	}
 }
 
-int* decimal_to_binary(int decimal, int *binary, int index)
+void decimal_to_binary(int decimal, int *binary, int index)
 {
 	if(decimal/2 == 0)
 	{
 		binary[index] = decimal%2;
-		return binary;
+		return;
 	}
 
 	else
@@ -292,39 +309,15 @@ int* decimal_to_binary(int decimal, int *binary, int index)
 	}
 }
 
-int main()
+void char_frequency(FILE *counting, int *frequency)
 {
-	//LER ARQUIVO
-
-	FILE *input;
-	int frequency[256] = {0};
-
-	input = fopen("leitura.txt", "r");
-
-	if(input == NULL)
-	{
-		printf("Error!\n");
-		exit(0);
-	}
-
-	//CONTAR FREQUENCIA DE CADA CHAR EM UM ARRAY
-
 	int x;
-	unsigned char aux = '\\'; //CHAR DE ESCAPE PARA O ASTERISCO
 
-	while((x = fgetc(input)))
+	while((x = fgetc(counting)))
 	{
 		if(x != EOF)
 		{
-			if(x == '*')
-			{
-				frequency[aux]++;
-			}
-
-			else if(x != 10)
-			{
-				frequency[x]++;
-			}
+			frequency[x]++;
 		}
 
 		else
@@ -332,13 +325,10 @@ int main()
 			break;
 		}
 	}
+}
 
-	fclose(input);
-
-	//ADICIONAR CHAR NUMA LISTA PARTINDO DO ARRAY ONDE NAO FOR NULO
-
-	Node* list = create_linked_list();
-
+Node* char_list(Node *list, int *frequency)
+{
 	for(int i = 0; i < 256; i++)
 	{
 		if(frequency[i] != 0)
@@ -347,42 +337,48 @@ int main()
 		}
 	}
 
-	//ORDENAR LISTA EM ORDEM CRESCENTE
+	return list;
+}
 
-	bubble_sort(list);
-
-	Node *root = (list);
-
-	//ORDENAR NODES DA ARVORE ENQUANTO FAZ O MERGE
-
+Node* make_tree(Node *root) //ORDENAR NODES DA ARVORE ENQUANTO FAZ O MERGE
+{
 	while(root -> next_node != NULL) // SÓ CHAMA A FUNÇÃO SE HOUVER MAIS DE UM NODE SOBRANDO //
 	{
 		root = merge_nodes(root);
+		root = sort_tree(root);
 	}
 
-	//CODIFICAÇÃO
+	return root;
+}
 
-	int byte[8] = {0};
-	int i = 0;
-
-	Hashtable *ht = create_hashtable(); // CRIA HASH PARA GUARDAR BITS DE CADA CARACTERE //
-	codify(root, ht, byte, i); // CHAMA FUNÇÃO PARA CONTAR E SETAR OS BITS //
-
-	//ORDEM DE IMPRESSAO
-
-	Q_Node *queue = create_queue();
-
+Q_Node* text_queue(FILE *reading, Q_Node *queue, Hashtable *ht) // FUNÇÃO QUE ENFILEIRA TEXTO JÁ CODIFICADO NA ORDEM ORIGINAL DE ENTRADA
+{
 	unsigned char c = 0;
-	int k = 0;
+	int x, m, k = 0;
 
-	FILE *read;
-	read = fopen("leitura.txt", "r");
+	// OBS: M = AUXILIAR PARA PEGAR OS BITS DO LUGAR CORRETO (CASO DOS CHARS DE ESCAPE)
+	// OBS: K = INDICE DE CONTROLE DO TAMANHO DE C //
 
-	while((x = fgetc(read))) //PEGA NOVAMENTE O ARQUIVO ORIGINAL E GUARDA OS BITS DE CADA LETRA, NA ORDEM, EM UMA FILA
+	while((x = fgetc(reading))) //PEGA NOVAMENTE O ARQUIVO ORIGINAL E GUARDA OS BITS DE CADA LETRA, NA ORDEM, EM UMA FILA
 	{
-		if(x != EOF && x != 10)
+		if(x != EOF)
 		{
-			for(int j = 0; j < ht->table[x] -> size; j++, k++) // QUANDO ENCONTRAR, COPIA SEUS BITS, USANDO SEU TAMANHO PARA CONTROLAR //
+			if(x == '*') // SE NO TEXTO TIVER ASTERISCO, PEGA O CODIGO DO CONTRA BARRA SEM FLAG (ESCAPE DO ASTERISCO)
+			{
+				m = '\\';
+			}
+
+			else if(x == '\\') // SE NO TEXTO TIVER CONTRA BARRA, PEGA O CÓDIGO DO CONTRA BARRA COM FLAG (ESCAPE DO CONTRA BARRA)
+			{
+				m = 256;
+			}
+
+			else
+			{
+				m = x; // CASO CONTRÁRIO, PEGA A POSIÇÃO REAL NA HASH
+			}
+
+			for(int j = 0; j < ht->table[m] -> size; j++, k++) // QUANDO ENCONTRAR, COPIA SEUS BITS, USANDO SEU TAMANHO PARA CONTROLAR //
 			{
 				if(k == 8) // QUANDO CHEGAR AO ULTIMO BIT, IMPRIME O CHAR E O ZERA, ZERANDO TAMBEM SEU INDICE DE CONTROLE //
 				{
@@ -391,12 +387,10 @@ int main()
 					k = 0;
 				}
 
-				if(is_bit_set(ht -> table[x] -> bits, j)) // VERIFICA BIT POR BIT ATÉ O TAMANHO, SE ESTIVER SETADO, SETA EM C //
+				if(is_bit_set(ht -> table[m] -> bits, j)) // VERIFICA BIT POR BIT ATÉ O TAMANHO, SE ESTIVER SETADO, SETA EM C //
 				{
 					c = set_bit(c, k);
 				}
-
-				// OBS: K = INDICE DE CONTROLE DO TAMANHO DE C //
 			}
 		}
 
@@ -406,31 +400,16 @@ int main()
 		}
 	}
 
-	queue = enqueue(queue, c); //ENFILEIRA ULTIMO CHAR QUE NÃO ENTROU NO SEGUNDO IF POR CONTA DO ARQUIVO TER ACABADO
+	queue = enqueue(queue, c); //ENFILEIRA ULTIMO CHAR QUE NÃO ENTROU NO PRIMEIRO IF POR CONTA DO ARQUIVO TER ACABADO
+	queue -> remain = k; // INTEIRO QUE GUARDA A QUANTIDADE DE BITS QUE  FORAM PREENCHIDAS NO ULTIMO UNSIGNED
 
-	//TAMANHO DO LIXO
+	return queue;
+}
 
-	int trash = (8 - k);
-
-	//PEGAR TAMANHO DA ARVORE
-
-	int tree = 0;
-	tree = tree_size(root, tree);
-
-	// CONVERTER TAMANHOS DE LIXO E ARVORE PARA BINARIO
-
-	int binary[16] = {0};
-
-	decimal_to_binary(trash, binary, 2);
-	decimal_to_binary(tree, binary, 15);
-
-	// ESCREVER TUDO NO ARQUIVO .HUFF
-
-	FILE *output;
-
-	output = fopen("teste.txt", "w");
-
-	c = 0;
+void create_huff(FILE *writing, int *binary, Node *root, Q_Node *queue) // FUNCAO PARA ESCREVER TUDO O QUE FOI FEITO NO ARQUIVO .HUFF
+{
+	unsigned char c = 0;
+	int k;
 
 	// TAMANHOS
 
@@ -438,8 +417,7 @@ int main()
 	{
 		if(k == 8)
 		{
-			fprintf(output, "%u", c);
-			fprintf(output, "\n");
+			fprintf(writing, "%u", c);
 			c = 0;
 			k = 0;
 		}
@@ -450,12 +428,11 @@ int main()
 		}
 	}
 
-	fprintf(output, "%u", c); // ULTIMO CHAR PREENCHIDO
-	fprintf(output, "\n");
+	fprintf(writing, "%u", c); // ULTIMO CHAR PREENCHIDO
 
 	// IMPRIMIR ARVORE NO ARQUIVO
 
-	print_pre_order(root, output);
+	print_pre_order(root, writing);
 
 	// ESCREVER NO ARQUIVO OS CHARS PRESENTES NA FILA, MANTENDO A ORDEM DO ARQUIVO ORIGINAL
 
@@ -463,15 +440,92 @@ int main()
 
 	while(current != NULL)
 	{
-		fprintf(output, "%u", current -> item);
-		fprintf(output, "\n");
+		fprintf(writing, "%u", current -> item);
 
 		current = current -> next_qnode;
 	}
+}
+
+void compress()
+{
+	//LER ARQUIVO
+
+	FILE *input;
+	int frequency[256] = {0};
+
+	input = fopen("file.txt", "r");
+
+	if(input == NULL)
+	{
+		printf("Error!\n");
+		exit(0);
+	}
+
+	//CONTAR FREQUENCIA DE CADA CHAR EM UM ARRAY
+
+	char_frequency(input, frequency);
+
+	fclose(input);
+
+	//ADICIONAR CHAR NUMA LISTA PARTINDO DO ARRAY ONDE NAO FOR NULO
+
+	Node* list = create_linked_list();
+	list = char_list(list, frequency);
+
+	//ORDENAR LISTA EM ORDEM CRESCENTE
+
+	bubble_sort(list);
+
+	// MONTAGEM DA ÁRVORE
+
+	Node *root = list;
+	root = make_tree(root);
+
+	//CODIFICAÇÃO
+
+	int byte[8] = {0};
+	int i = 0;
+
+	Hashtable *ht = create_hashtable(); // CRIA HASH PARA GUARDAR BITS DE CADA CARACTERE //
+
+	codify(root, ht, byte, i); // CHAMA FUNÇÃO PARA CONTAR E SETAR OS BITS //
+
+	//ORDEM DE IMPRESSAO DO TEXTO
+
+	Q_Node *queue = create_queue();
+
+	FILE *read;
+	read = fopen("file.txt", "r");
+
+	queue = text_queue(read, queue, ht);
+
+	//TAMANHO DO LIXO
+
+	int trash = (8 - queue -> remain);
+
+	//PEGAR TAMANHO DA ARVORE
+
+	int tree = 0;
+	tree = tree_size(root, tree);
+
+	// CONVERTER TAMANHOS DE LIXO E ARVORE PARA BINARIO
+
+	int binary[16] = {0};
+	decimal_to_binary(trash, binary, 2);
+	decimal_to_binary(tree, binary, 15);
+
+	// ESCREVER TUDO NO ARQUIVO .HUFF
+
+	FILE *output;
+	output = fopen("compressed_file.huff", "w");
+
+	create_huff(output, binary, root, queue);
 
 	fclose(output); // FECHA ARQUIVO //
+}
 
-	//********OBS: VER "BARRA-BARRA"
+int main()
+{
+	compress(); // FUNÇÃO DE COMPRESSÃO
 
 	return 0;
-}
