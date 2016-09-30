@@ -5,8 +5,8 @@
  *      Author: rodolfomoreira
  */
 
-#ifndef HUFFMANLIST_H_
-#define HUFFMANLIST_H_
+#ifndef LINKEDLIST_H_
+#define LINKEDLIST_H_
 
 typedef struct Node Node;
 
@@ -14,9 +14,8 @@ Node* create_linked_list();
 
 Node* insert_item(Node *node, unsigned char item, int priority);
 
+Node* char_list(Node *list, int *frequency);
+
 void bubble_sort(Node *first);
 
-void print_pre_order(Node *tree, FILE *printing);
-
-
-#endif /* HUFFMANLIST_H_ */
+#endif /* LINKEDLIST_H_ */

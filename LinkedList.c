@@ -53,6 +53,19 @@ Node* insert_item(Node *node, unsigned char item, int priority) // Função de c
 	return newnode;
 }
 
+Node* char_list(Node *list, int *frequency)
+{
+	for(int i = 0; i < 256; i++)
+	{
+		if(frequency[i] != 0)
+		{
+			list = insert_item(list, i, frequency[i]);
+		}
+	}
+
+	return list;
+}
+
 void bubble_sort(Node *first)
 {
 	char aux_item;
@@ -77,29 +90,6 @@ void bubble_sort(Node *first)
 				current -> priority = aux_priority;
 				current -> flag = aux_flag;
 			}
-		}
-	}
-}
-
-void print_pre_order(Node *tree, FILE *printing)
-{
-	if(tree != NULL)
-	{
-		fprintf(printing, "%u", tree->item); // Imprime cada unsigned no arquivo de saída
-
-		if(tree->flag) // SE A FLAG ESTIVER SETADA (ESCAPE DO CONTRA BARRA) IMPRIME NOVAMENTE PARA DIFERENCIAR NA DESCOMPRESSAO (MONTAGEM DA ÁRVORE)
-		{
-			fprintf(printing, "%u", tree->item);
-		}
-
-		if(tree->left != NULL)
-		{
-			print_pre_order(tree->left, printing);
-		}
-
-		if(tree->right != NULL)
-		{
-			print_pre_order(tree->right, printing);
 		}
 	}
 }

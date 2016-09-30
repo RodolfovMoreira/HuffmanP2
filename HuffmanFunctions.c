@@ -1,5 +1,19 @@
 #include "HuffmanLibrary.h"
 
+typedef struct Hashtable{
+	Character *table[257];
+}Hashtable;
+
+typedef struct Node{
+	unsigned char item;
+	int priority;
+	int flag;
+	struct Node *next_node;
+	struct Node *previous_node;
+	struct Node *left;
+	struct Node *right;
+}Node;
+
 typedef struct Q_Node{
 	unsigned char item;
 	int remain;
@@ -23,10 +37,6 @@ int set_bit(unsigned char bits, int position)
 	return mask | bits;
 }
 
-Q_Node* create_queue(){
-	return NULL;
-}
-
 Character* new_character(int *bytes, int index) // Armazena os bits na hash
 {
 	Character *new_character = (Character*) malloc(sizeof(Character));
@@ -44,159 +54,6 @@ Character* new_character(int *bytes, int index) // Armazena os bits na hash
 	new_character -> size = index;
 
 	return new_character;
-}
-
-Q_Node* enqueue(Q_Node* queue, unsigned char item)
-{
-	Q_Node* newqnode = (Q_Node*) malloc(sizeof(Q_Node));
-	newqnode -> item = item;
-	newqnode -> remain = 0;
-
-	if(queue == NULL) //SE A FILA ESTIVER VAZIA, ADICIONA NA CABEÇA
-	{
-		return newqnode;
-	}
-
-	else
-	{
-		Q_Node* current = queue;
-
-		while(current -> next_qnode != NULL) //SE NAO ESTIVER, PROCURA O ULTIMO NODE E ADICIONA NELE
-		{
-			current = current -> next_qnode;
-		}
-
-		newqnode -> next_qnode = current -> next_qnode;
-		current -> next_qnode = newqnode;
-	}
-
-	return queue;
-}
-
-Q_Node* text_queue(FILE *reading, Q_Node *queue, Hashtable *ht) // FUNÇÃO QUE ENFILEIRA TEXTO JÁ CODIFICADO NA ORDEM ORIGINAL DE ENTRADA
-{
-	unsigned char c = 0;
-	int x, m, k = 0;
-
-	// OBS: M = AUXILIAR PARA PEGAR OS BITS DO LUGAR CORRETO (CASO DOS CHARS DE ESCAPE)
-	// OBS: K = INDICE DE CONTROLE DO TAMANHO DE C //
-
-	while((x = fgetc(reading))) //PEGA NOVAMENTE O ARQUIVO ORIGINAL E GUARDA OS BITS DE CADA LETRA, NA ORDEM, EM UMA FILA
-	{
-		if(x != EOF)
-		{
-			if(x == '*') // SE NO TEXTO TIVER ASTERISCO, PEGA O CODIGO DO CONTRA BARRA SEM FLAG (ESCAPE DO ASTERISCO)
-			{
-				m = '\\';
-			}
-
-			else if(x == '\\') // SE NO TEXTO TIVER CONTRA BARRA, PEGA O CÓDIGO DO CONTRA BARRA COM FLAG (ESCAPE DO CONTRA BARRA)
-			{
-				m = 256;
-			}
-
-			else
-			{
-				m = x; // CASO CONTRÁRIO, PEGA A POSIÇÃO REAL NA HASH
-			}
-
-			for(int j = 0; j < ht->table[m] -> size; j++, k++) // QUANDO ENCONTRAR, COPIA SEUS BITS, USANDO SEU TAMANHO PARA CONTROLAR //
-			{
-				if(k == 8) // QUANDO CHEGAR AO ULTIMO BIT, IMPRIME O CHAR E O ZERA, ZERANDO TAMBEM SEU INDICE DE CONTROLE //
-				{
-					queue = enqueue(queue, c);
-					c = 0;
-					k = 0;
-				}
-
-				if(is_bit_set(ht -> table[m] -> bits, j)) // VERIFICA BIT POR BIT ATÉ O TAMANHO, SE ESTIVER SETADO, SETA EM C //
-				{
-					c = set_bit(c, k);
-				}
-			}
-		}
-
-		else
-		{
-			break;
-		}
-	}
-
-	queue = enqueue(queue, c); //ENFILEIRA ULTIMO CHAR QUE NÃO ENTROU NO PRIMEIRO IF POR CONTA DO ARQUIVO TER ACABADO
-	queue -> remain = k; // INTEIRO QUE GUARDA A QUANTIDADE DE BITS QUE  FORAM PREENCHIDAS NO ULTIMO UNSIGNED
-
-	return queue;
-}
-
-Node* sort_tree(Node *root)
-{
-	while(root -> next_node != NULL && root -> priority > root -> next_node -> priority) // ENQUANTO NÃO CHEGAR AO FIM DA LISTA E ENQUANTO SUA PRIORIDADE FOR MAIOR //
-	{
-		if(root -> next_node -> next_node != NULL)
-		{
-			root -> next_node -> next_node -> previous_node = root;
-		}
-
-		if(root -> previous_node != NULL)
-		{
-			root -> previous_node ->next_node = root -> next_node;
-		}
-
-		root -> next_node -> previous_node = root ->previous_node;
-		root -> previous_node = root -> next_node;
-		root -> next_node = root -> next_node -> next_node;
-		root -> previous_node -> next_node = root;
-	}
-
-	while(root -> previous_node != NULL)
-	{
-		root = root -> previous_node; // PROCURA A CABEÇA PARA RETORNAR //
-	}
-
-	return root;
-}
-
-Node* merge_nodes(Node *first)
-{
-	Node *root = (Node*) malloc(sizeof(Node));  // CRIA RAIZ PARA AGRUPAR DOIS NODES //
-
-	root -> item = '*'; // CHAR DE REPRESENTAÇÃO //
-	root -> priority = (first -> priority + first -> next_node -> priority); // SOMA AS PRIORIDADES DOS DOIS MENORES //
-	root -> flag = 0;
-	root -> next_node = NULL;
-	root -> previous_node = NULL;
-
-	if(first -> next_node -> next_node != NULL)
-	{
-		root -> next_node = first -> next_node -> next_node; // SE HOUVER UM TERCEIRO NODE, FAZ ROOT RECONHECE-LO //
-	}
-
-	root -> left = first; // LEFT PEGA O MENOR //
-	root -> right = first -> next_node; // RIGHT PEGA O PRÓXIMO //
-
-	root -> left -> next_node = NULL; // SETA OS PONTEIROS DE CADA NODE AGRUPADO PARA NULL, FORMANDO A ÁRVORE //
-	root -> left -> previous_node = NULL;
-	root -> right -> next_node = NULL;
-	root -> right -> previous_node = NULL;
-
-	return root; // RETORNA A RAIZ PARA O FIRST NA MAIN //
-}
-
-int tree_size(Node *tree, int size)
-{
-	size++;
-
-	if(tree->left != NULL)
-	{
-		size = tree_size(tree->left, size);
-	}
-
-	if(tree->right != NULL)
-	{
-		size = tree_size(tree->right, size);
-	}
-
-	return size;
 }
 
 void codify(Node *tree, Hashtable *ht, int *byte, int i)
@@ -267,30 +124,6 @@ void char_frequency(FILE *counting, int *frequency)
 			break;
 		}
 	}
-}
-
-Node* char_list(Node *list, int *frequency)
-{
-	for(int i = 0; i < 256; i++)
-	{
-		if(frequency[i] != 0)
-		{
-			list = insert_item(list, i, frequency[i]);
-		}
-	}
-
-	return list;
-}
-
-Node* make_tree(Node *root) //ORDENAR NODES DA ARVORE ENQUANTO FAZ O MERGE
-{
-	while(root -> next_node != NULL) // SÓ CHAMA A FUNÇÃO SE HOUVER MAIS DE UM NODE SOBRANDO //
-	{
-		root = merge_nodes(root);
-		root = sort_tree(root);
-	}
-
-	return root;
 }
 
 void create_huff(FILE *writing, int *binary, Node *root, Q_Node *queue) // FUNCAO PARA ESCREVER TUDO O QUE FOI FEITO NO ARQUIVO .HUFF
@@ -409,4 +242,59 @@ void compress()
 	create_huff(output, binary, root, queue);
 
 	fclose(output); // FECHA ARQUIVO //
+}
+
+Q_Node* text_queue(FILE *reading, Q_Node *queue, Hashtable *ht) // FUNÇÃO QUE ENFILEIRA TEXTO JÁ CODIFICADO NA ORDEM ORIGINAL DE ENTRADA
+{
+	unsigned char c = 0;
+	int x, m, k = 0;
+
+	// OBS: M = AUXILIAR PARA PEGAR OS BITS DO LUGAR CORRETO (CASO DOS CHARS DE ESCAPE)
+	// OBS: K = INDICE DE CONTROLE DO TAMANHO DE C //
+
+	while((x = fgetc(reading))) //PEGA NOVAMENTE O ARQUIVO ORIGINAL E GUARDA OS BITS DE CADA LETRA, NA ORDEM, EM UMA FILA
+	{
+		if(x != EOF)
+		{
+			if(x == '*') // SE NO TEXTO TIVER ASTERISCO, PEGA O CODIGO DO CONTRA BARRA SEM FLAG (ESCAPE DO ASTERISCO)
+			{
+				m = '\\';
+			}
+
+			else if(x == '\\') // SE NO TEXTO TIVER CONTRA BARRA, PEGA O CÓDIGO DO CONTRA BARRA COM FLAG (ESCAPE DO CONTRA BARRA)
+			{
+				m = 256;
+			}
+
+			else
+			{
+				m = x; // CASO CONTRÁRIO, PEGA A POSIÇÃO REAL NA HASH
+			}
+
+			for(int j = 0; j < ht->table[m] -> size; j++, k++) // QUANDO ENCONTRAR, COPIA SEUS BITS, USANDO SEU TAMANHO PARA CONTROLAR //
+			{
+				if(k == 8) // QUANDO CHEGAR AO ULTIMO BIT, IMPRIME O CHAR E O ZERA, ZERANDO TAMBEM SEU INDICE DE CONTROLE //
+				{
+					queue = enqueue(queue, c);
+					c = 0;
+					k = 0;
+				}
+
+				if(is_bit_set(ht -> table[m] -> bits, j)) // VERIFICA BIT POR BIT ATÉ O TAMANHO, SE ESTIVER SETADO, SETA EM C //
+				{
+					c = set_bit(c, k);
+				}
+			}
+		}
+
+		else
+		{
+			break;
+		}
+	}
+
+	queue = enqueue(queue, c); //ENFILEIRA ULTIMO CHAR QUE NÃO ENTROU NO PRIMEIRO IF POR CONTA DO ARQUIVO TER ACABADO
+	queue -> remain = k; // INTEIRO QUE GUARDA A QUANTIDADE DE BITS QUE  FORAM PREENCHIDAS NO ULTIMO UNSIGNED
+
+	return queue;
 }

@@ -1,4 +1,3 @@
-
 #ifndef HUFFMANLIBRARY_H_
 #define HUFFMANLIBRARY_H_
 
@@ -9,11 +8,15 @@
 
 #include <string.h>
 
+#include "Hashtable.h"
+
 #include "HuffmanFunctions.h"
 
-#include "HuffmanHashtable.h"
+#include "LinkedList.h"
 
-#include "HuffmanList.h"
+#include "PriorityQueue.h"
+
+#include "Tree.h"
 
 
 #endif /* HUFFMANLIBRARY_H_ */
