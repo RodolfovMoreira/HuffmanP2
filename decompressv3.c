@@ -89,9 +89,9 @@ BinaryTree* create_bt_node(unsigned char item, int flag)
 }
 
 int index = 0; //INDICE DE CONTROLE DA POSICAO DA STRING DA ARVORE
-int backslash = 0; //INDICE QUE MARCA A POSICAO DO CONTRA-BARRA REAL NA STRING
+//BACKSLASH - INDICE QUE MARCA A POSICAO DO CONTRA-BARRA REAL NA STRING
 
-BinaryTree* remake_tree(BinaryTree *bt, unsigned char *string, int size)
+BinaryTree* remake_tree(BinaryTree *bt, unsigned char *string, int size, int backslash)
 {
 	if(index == size+1) //SE CHEGAR AO FIM DA LISTA DA ARVORE, RETORNA
 	{
@@ -104,9 +104,9 @@ BinaryTree* remake_tree(BinaryTree *bt, unsigned char *string, int size)
 		{
 			bt = create_bt_node(string[index], 0);
 			index++;
-			bt->left = remake_tree(bt->left, string, size);
+			bt->left = remake_tree(bt->left, string, size, backslash);
 			index++;
-			bt->right = remake_tree(bt->right, string, size);
+			bt->right = remake_tree(bt->right, string, size, backslash);
 		}
 
 		else //SE FOR UM CHAR QUALQUER, ADICIONA NA FOLHA E RETORNA
@@ -283,6 +283,7 @@ void decompress()
 	// FAZER UMA STRING COM A ESTRUTURA DA ÁRVORE
 
 	unsigned char insert_on_tree[tree_size];
+	int backslash;
 	
 	for(int j = 0; j < tree_size; j++)
 	{
@@ -303,7 +304,7 @@ void decompress()
 	// MONTAR ÁRVORE ATÉ O TAM DA ÁRVORE ENCONTRADO //
 
 	BinaryTree *root = create_empty_tree();
-	root = remake_tree(root, insert_on_tree, tree_size);
+	root = remake_tree(root, insert_on_tree, tree_size, backslash);
 
 	// NAVEGA NA ÁRVORE E IMPRIME NO ARQUIVO DE SAIDA OS CHARS CORRESPONDENTES A CODIFICACAO
 
