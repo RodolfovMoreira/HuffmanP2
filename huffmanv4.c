@@ -39,15 +39,7 @@ Character* new_character(int *byte, int index) // ARMAZENA OS BITS EM CADA CASA 
 
 	for(int i = 0; i < index; i++) // RODA UM LOOP ATÉ A CASA ATUAL DO ARRAY BYTES //
 	{
-		if(byte[i] == 1) // SE FOR 1, SETA O BIT //
-		{
-			new_character -> code[i] = 1;
-		}
-
-		else
-		{
-			new_character -> code[i] = 0;
-		}
+		new_character -> code[i] = byte[i]; // SE FOR 1, SETA 1 BIT NA POSIÇÃO, SE FOR 0, SETA 0 NA POSIÇÃO //
 	}
 
 	new_character -> size = index;
