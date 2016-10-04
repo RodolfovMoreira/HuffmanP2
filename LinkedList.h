@@ -1,10 +1,3 @@
-/*
- * HuffmanList.h
- *
- *  Created on: 28 de set de 2016
- *      Author: rodolfomoreira
- */
-
 #ifndef LINKEDLIST_H_
 #define LINKEDLIST_H_
 

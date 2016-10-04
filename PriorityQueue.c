@@ -1,7 +1,7 @@
-#include "HuffmanLibrary.h"
+#include "Huff_Library.h"
 
 typedef struct Character{
-	unsigned char bits;
+	int code[30];
 	int size;
 }Character;
 
@@ -25,16 +25,15 @@ Q_Node* enqueue(Q_Node* queue, unsigned char item)
 	newqnode -> item = item;
 	newqnode -> remain = 0;
 
-	if(queue == NULL) //SE A FILA ESTIVER VAZIA, ADICIONA NA CABEÇA
+	if(queue == NULL) // Se a fila estiver vazia, adiciona na cabeça
 	{
 		return newqnode;
 	}
-
 	else
 	{
 		Q_Node* current = queue;
 
-		while(current -> next_qnode != NULL) //SE NAO ESTIVER, PROCURA O ULTIMO NODE E ADICIONA NELE
+		while(current -> next_qnode != NULL) // Se não estiver, procura o último nó e adiciona nele
 		{
 			current = current -> next_qnode;
 		}
@@ -46,4 +45,76 @@ Q_Node* enqueue(Q_Node* queue, unsigned char item)
 	return queue;
 }
 
+Q_Node* text_queue(FILE *reading, Q_Node *queue, Hashtable *ht) // Enfileira texto codificado na ordem original
+{
+	unsigned char c = 0;
+	int x, m, k = 0;
 
+	// M = Auxiliar na obtenção dos bits no lugar correto (chars de escape)
+	// K = Índice de controle do tamanho de C
+
+
+	while((x = fgetc(reading))) // Abre o arquivo, lê e vai criando os unsg. e colocando na fila
+	{
+		if(x != EOF)
+		{
+			if(x == '*') // Se no texto houver '*', pega o código do contra barra sem flag (escape do '*')
+			{
+				m = '\\';
+			}
+
+			else if(x == '\\') // Se no texto houver '\', pega o código do contra barra com flag (escape do '\')
+			{
+				m = 256;
+			}
+
+			else
+			{
+				m = x; // Caso contrário pega a posição real na hash
+			}
+
+			for(int j = 0; j < ht->table[m] -> size; j++, k++) // Adiciona os bits de acordo com tamanho do código
+			{
+				if(k == 8) // Chegando ao último bit, imprime o unsg. e reenicia o preenchimento de outro unsg.
+				{
+					queue = enqueue(queue, c);
+					c = 0;
+					k = 0;
+				}
+				if(ht -> table[m] -> code[j]) // Caso o código conter '1', seta o unsigned na posição atual
+				{
+					c = set_bit(c, k);
+				}
+			}
+		}
+
+		else
+		{
+			break;
+		}
+	}
+
+	queue = enqueue(queue, c); // Enfileira o último caractere (não entrou no primeiro if pois o arquivo acabou)
+	queue -> remain = 8-k; // Inteiro que guarda a quantidade de bits que foram preenchidas no último unsigned
+	printf("passei da qremain\n");
+	return queue;
+}
+
+Q_Node* compressed_queue(FILE *copying, Q_Node *D_Queue)
+{
+	int x;
+
+	while(1)
+	{
+		x = fgetc(copying);
+
+		if(feof(copying)) // Para se chegar ao fim do arquivo
+		{
+			break;
+		}
+
+		D_Queue = enqueue(D_Queue, x); // Enfileira cada unsigned numa fila
+	}
+
+	return D_Queue;
+}

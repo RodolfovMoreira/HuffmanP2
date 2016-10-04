@@ -1,5 +1,5 @@
-#ifndef TREE_H_
-#define TREE_H_
+#ifndef BINARYTREE_COMPRESSION_H_
+#define BINARYTREE_COMPRESSION_H_
 
 typedef struct Node Node;
 
@@ -13,4 +13,4 @@ Node* make_tree(Node *root);
 
 void print_pre_order(Node *tree, FILE *printing);
 
-#endif /* TREE_H_ */
+#endif /* BINARYTREE_COMPRESSION_H_ */

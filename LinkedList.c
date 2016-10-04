@@ -1,4 +1,4 @@
-#include "HuffmanLibrary.h"
+#include "Huff_Library.h"
 
 typedef struct Node{
 	unsigned char item;
@@ -10,50 +10,50 @@ typedef struct Node{
 	struct Node *right;
 }Node;
 
-Node* create_linked_list(){ // Inicializando lista encadeada
+Node* create_linked_list()
+{
 	return NULL;
 }
 
-Node* insert_item(Node *node, unsigned char item, int priority) // Função de criação e inserção de novo nó na lista
+Node* insert_item(Node *node, unsigned char item, int priority) // Função de criação e inserção de nó na lista
 {
-	Node *newnode = (Node*) malloc(sizeof(Node));
+	// ------------ Alocação/Definição do Nó -----------------
 
+	Node *newnode = (Node*) malloc(sizeof(Node));
 	newnode -> item = item;
 	newnode -> priority = priority;
 	newnode -> flag = 0;
-	newnode -> next_node = node;
-	newnode -> previous_node = NULL;
 
-	//---------------- Flags que resolvem o problema do coringa ---------------
+
+	// --------------- Diferenciação do coringa ---------------
 
 	if(item == '\\')
 	{
-		newnode -> flag = 1; // Marcação de caractere de escape
+		newnode -> flag = 1; // Marcação do caractere de escape
 	}
 
 	else if(item == '*')
 	{
-		newnode -> item = '\\'; // Caractere de escape para diferenciar de asterisco da árvore
+		newnode -> item = '\\'; // Caractere de escape para diferenciar do coringa
 	}
 
-	// -------------------------------------------------------------------------
+	// ---------------- Setando o Nó --------------------------
+
+	newnode -> next_node = node;
+	newnode -> previous_node = NULL;
 
 	if(newnode -> next_node != NULL)
 	{
-		newnode -> next_node -> previous_node = newnode; // Setando o 'previously'
+		newnode -> next_node -> previous_node = newnode;
 	}
-
-	//------- Setando ponteiros das árvores ---
 
 	newnode -> left = NULL;
 	newnode -> right = NULL;
 
-	// ----------------------------------------
-
 	return newnode;
 }
 
-Node* char_list(Node *list, int *frequency)
+Node* char_list(Node *list, int *frequency) // Função de criação da lista de frequências
 {
 	for(int i = 0; i < 256; i++)
 	{
@@ -66,7 +66,7 @@ Node* char_list(Node *list, int *frequency)
 	return list;
 }
 
-void bubble_sort(Node *first)
+void bubble_sort(Node *first) // BubbleSort para ordenação da lista de acordo com as frequências
 {
 	char aux_item;
 	int aux_priority, aux_flag;
@@ -93,4 +93,5 @@ void bubble_sort(Node *first)
 		}
 	}
 }
+
 

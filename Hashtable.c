@@ -1,10 +1,10 @@
-#include "HuffmanLibrary.h"
+#include "Huff_Library.h"
 
 typedef struct Hashtable{
 	Character *table[257];
 }Hashtable;
 
-Hashtable* create_hashtable() // Cria Hashtable que armazena o código de cada caractere
+Hashtable* create_hashtable() // Função para criação da Hashtable que armazena o código de cada caractere
 {
 	Hashtable *ht = (Hashtable*) malloc(sizeof(Hashtable));
 
