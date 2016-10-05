@@ -115,7 +115,6 @@ void codify(Node *tree, Hashtable *ht, int *byte, int i) // Criação dos códig
 			i--;
 		}
 	}
-	printf("xablau\n");
 }
 
 void decimal_to_binary(int decimal, int *binary, int index)
@@ -229,7 +228,6 @@ void compress()
 	Node *root = list;
 	root = make_tree(root);
 
-	printf("PASSOU DA MAKE TREE\n");
 	// Função abaixo contorna problema quando arquivo a ser compactado contém somente um caractere
 
 	unique_char(root);
@@ -242,8 +240,6 @@ void compress()
 	Hashtable *ht = create_hashtable(); // Hash de armazenamento dos códigos
 
 	codify(root, ht, byte, i); // Função para coleta e armazenagem dos códigos
-	printf("PASSOU DA CODIFY\n");
-	printf("asdoaia");
 
 	// Fila para impressão de acordo com o texto original
 	Q_Node *queue = create_queue();
@@ -252,16 +248,16 @@ void compress()
 	read = fopen("file.txt", "r");
 
 	queue = text_queue(read, queue, ht);
-	printf("PASSOU DA TEXT QUEUE\n");
+
 	// Obtenção do tamanho do lixo
 
 	int trash = queue -> remain;
-	printf("lixo %d\n", trash);
+
 	// Obtenção do tamanho da árvore
 
 	int tree = 0;
 	tree = tree_size(root, tree);
-	printf("PASSOU DA TREE SIZE\n");
+
 	// Conversão do tamanho do lixo e da árvore para binário
 
 	int binary[16] = {0};
@@ -274,7 +270,6 @@ void compress()
 	output = fopen("compressed_file.huff", "w");
 
 	create_huff(output, binary, root, queue);
-	printf("PASSOU DA CREATE H\n");
 
 	fclose(output);
 }
@@ -458,9 +453,8 @@ void decompress()
 	Q_Node *current = D_Queue;
 
 	int trash_size = sizeof_trash(current);
-	printf("size of trash: %d\n", trash_size);
 	int tree_size = sizeof_tree(current);
-	printf("size of tree: %d\n", tree_size);
+
 	// Seta current para início da árvore
 
 	for(int i = 0; i < 2; i++)

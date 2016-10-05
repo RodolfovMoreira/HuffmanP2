@@ -96,7 +96,7 @@ Q_Node* text_queue(FILE *reading, Q_Node *queue, Hashtable *ht) // Enfileira tex
 
 	queue = enqueue(queue, c); // Enfileira o último caractere (não entrou no primeiro if pois o arquivo acabou)
 	queue -> remain = 8-k; // Inteiro que guarda a quantidade de bits que foram preenchidas no último unsigned
-	printf("passei da qremain\n");
+
 	return queue;
 }
 

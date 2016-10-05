@@ -1,7 +1,6 @@
 #include "Huff_Library.h"
 
-int main()
-{
+int main(){
 	int x;
 
 	printf("Aperte:\n1 - Compactar\n2 - Descompactar\n");
