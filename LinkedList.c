@@ -1,3 +1,22 @@
+/*LINKEDLIST
+
+  Biblioteca de uma lista utilizada no projeto.
+
+TYPEDEF STRUCT NODE : Ver estrutura em 'BinaryTree_compression'
+
+-Funções-
+
+NODE* CREATE_LINKED_LIST():
+Função que inicializa a lista.
+
+NODE* INSERT_ITEM(NODE *NODE, UNSIGNED CHAR ITEM, INT PRIORITY):
+Função que cria um nó e insere na lista.
+
+NODE* CHAR_LIST(NODE *LIST, INT *FREQUENCY):
+Função que captura as frequências e cria uma lista dos caracteres.
+
+VOID BUBBLE_SORT(NODE *FIRST):
+Função que ordena a lista de acordo com as frequências.*/
 #include "Huff_Library.h"
 
 typedef struct Node{

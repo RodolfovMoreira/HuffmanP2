@@ -1,3 +1,16 @@
+/*HASHTABLE:
+
+  Biblioteca utilizada para criação da hash table que armazenará os códigos de cara caractere.
+
+TYPEDEF STRUCT HASHTABLE :
+Estrutura da hash que utilizaremos. Terá o componente:
+Character *table[257] (tipo de dado 'character', contido na biblioteca "PriorityQueue".
+
+-Funções-
+
+HASHTABLE* CREATE_HASHTABLE() :
+Função de inicialização da hash, alocará espaço na memória e seta os 257 espaços para NULL. (hash terá um espaço a mais por uma peculiaridade do código)*/
+
 #include "Huff_Library.h"
 
 typedef struct Hashtable{

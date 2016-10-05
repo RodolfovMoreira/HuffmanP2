@@ -7,3 +7,145 @@
 
 
 Criado em colaboração dos alunos Allan Bezerra, Rodolfo Moreira e Wagner Williams
+
+
+
+---------------------------- BIBLIOTECAS ---------------------------
+
+Bibliotecas desenvolvidas para tornar o código mais simples para entendimento, cada biblioteca trata com um tipo de dado diferente ou com funções que tenham um objetivo em comum (ex: Huff_Library). São elas:
+
+ 1 - BinaryTree_compression.h
+ 2 - BinaryTree_decompression.h
+ 3 - Hashtable.c
+ 4 - Huff_Library.h
+ 5 - Huffman_functions.h
+ 6 - LinkedList.h
+ 7 - PriorityQueue.h
+
+
+
+ 1 - BINARYTREE_COMPRESSION:
+ 
+ Biblioteca da árvore usada na compressão, funções que criam e auxiliam na montagem da árvore de Huffman.
+
+TYPEDEF STRUCT NODE : Nó que será usado na biblioteca. está estruturado em:
+Unsigned char item, int priority (ou frequência), int flag, struct Node *next_node, struct Node *previous_node, struct Node *left, struct Node *right. Nó que tem propriedades de árvore e lista.
+
+-Funções-
+
+NODE* SORT_TREE(NODE *ROOT) : Durante a criação da árvore, depois que os dois primeiros elementos forem somados e reinseridos na lista, a função sort_tree(root) reordenará a lista de acordo com a prioridade.
+
+NODE* MERGE_NODES(NODE *FIRST) : Função que recebe a lista, retira os dois primeiros elementos, soma suas prioridades e cria um galho que terá como folha os mesmos. O galho é reinserido na lista.
+
+INT TREE_SIZE(NODE *TREE, INT SIZE) : Função que retorna o tamanho da árvore para criação do cabeçalho.
+
+VOID PRINT_PRE_ORDER(NODE *TREE, FILE *PRINTING) : Imprime o a árvore no cabeçalho do arquivo compactado.
+
+
+
+ 2 - BINARYTREE_DECOMPRESSION:
+
+  Biblioteca da árvore usada na descompressão, árvore será criada a partir da leitura do arquivo compactado ".huff"
+
+TYPEDEF STRUCT BINARYTREE : Nó que será usado na biblioteca. Está estruturado em:
+Unsigned char item, int flag, struct BinaryTree *left, struct BinaryTree *right.
+
+-Funções-
+
+BINARYTREE* CREATE_EMPTY_TREE() : Retorna NULL, inicializando a árvore.
+
+BINARYTREE* CREATE_BT_NODE(UNSIGNED CHAR ITEM, INT FLAG) : Cria um nó na árvore.
+
+ 3 - HASHTABLE:
+
+  Biblioteca utilizada para criação da hash table que armazenará os códigos de cara caractere.
+
+TYPEDEF STRUCT HASHTABLE : Estrutura da hash que utilizaremos. Terá o componente: Character *table[257] (tipo de dado 'character', contido na biblioteca "PriorityQueue".
+
+-Funções-
+
+HASHTABLE* CREATE_HASHTABLE() : Função de inicialização da hash, alocará espaço na memória e seta os 257 espaços para NULL. (hash terá um espaço a mais por uma peculiaridade do código)
+
+ 4 - HUFFLIBRARY:
+
+  Biblioteca que contém todas as outras já criadas. O motivo para criação desta biblioteca foi para 'limpar' o código, sendo somente necessário a inserção de uma biblioteca.
+
+ 5 - HUFFMAN_FUNCTIONS: 
+
+  Biblioteca que reúne as funções necessárias para compressão e descompressão, utilizando de todas as outras bibliotecas auxiliares.
+
+TYPEDEF STRUCT CHARACTER : Ver descrição na biblioteca "PriorityQueue".
+
+TYPEDEF STRUCT HASHTABLE :  Ver descrição na biblioteca "Hashtable".
+
+TYPEDEF STRUCT NODE : Ver descrição na biblioteca "BinaryTree_compression".
+
+TYPEDEF STRUCT Q_NODE : Ver descrição na biblioteca "PriorityQueue".
+
+TYPEDEF STRUCT BINARYTREE : Ver descrição na biblioteca "BinaryTree_decompression".
+
+-Funções-
+
+INT SET_BIT(UNSIGNED CHAR BITS, INT POSITION) : Função utilizada para setar os bits da posição 'position' dada.
+
+INT IS_BIT_SET(UNSIGNED CHAR BITS, INT POSITION) : Função que verifica se o bit da posição 'position' está setado.
+
+VOID CHAR_FREQUENCY(FILE *COUNTING, INT *FREQUENCY) : Função que pega as frequências de cada caractere e armazena num array.
+
+CHARACTER* NEW_CHARACTER(INT *BYTE, INT INDEX) : Função que transfere o código do caractere obtido pela função 'codify' para a hashtable.
+
+VOID CODIFY(NODE *TREE, HASHTABLE *HT, INT BYTE, INT I) : Função que pega a codificação de cada caractere. Utiliza-se de recursão e tem semelhança com o algorítimo de printpreorder para obtenção dos códigos. Quando a função encontra um nó, ela armazena o código até agora obtido.
+
+VOID DECIMAL_TO_BINARY(INT DECIMAL, INT *BINARY, INT INDEX) : Transforma um número decimal em binário. (utilizada para criação do cabeçalho)
+
+VOID CREATE_HUFF(FILE *WRITING, INT *BINARY, NODE *ROOT, Q_NODE *QUEUE):
+Função que faz o cabeçalho e imprime a árvore no arquivo '.huff'
+
+NODE* UNIQUE_CHAR(NODE *ROOT) : Função que somente é chamada quando o arquivo a ser compactado contém somente um caractere.
+
+VOID COMPRESS(): Função que organiza e chama todas as outras necessárias para criação do arquivo compactado.
+
+INT POWN(INT NUMBER, INT I): Função de calcula potências.
+
+INT SIZEOF_TRASH(Q_NODE *QUEUE): Função que calcula o tamanho do lixo.
+
+INT SIZEOF_TREE(Q_NODE *QUEUE): Função que calcula o tamanho do lixo.
+
+VOID NAVIGATE_ON_TREE(FILE *NEWOUT, BINARYTREE *ROOT, Q_NODE *QUEUE, INT SIZE):
+Função que recebe uma fila de unsigneds e vai descompactando um por um.
+
+VOID DECOMPRESS(): Função que organiza e chama todas as outras necessárias para o arquivo ser descompactado.
+
+ 6 - LINKEDLIST
+
+  Biblioteca de uma lista utilizada no projeto.
+
+TYPEDEF STRUCT NODE : Ver estrutura em 'BinaryTree_compression'
+
+-Funções-
+
+NODE* CREATE_LINKED_LIST(): Função que inicializa a lista.
+
+NODE* INSERT_ITEM(NODE *NODE, UNSIGNED CHAR ITEM, INT PRIORITY): Função que cria um nó e insere na lista.
+
+NODE* CHAR_LIST(NODE *LIST, INT *FREQUENCY): Função que captura as frequências e cria uma lista dos caracteres.
+
+VOID BUBBLE_SORT(NODE *FIRST): Função que ordena a lista de acordo com as frequências.
+
+ 7 - PRIORITYQUEUE
+
+  Biblioteca de criação da fila.
+
+TYPEDEF STRUCT CHARACTER:  Estrutura encontrada na biblioteca "PriorityQueue", contém: int code[30], int size.
+
+TYPEDEF STRUCT HASHTABLE: Ver biblioteca 'Hashtable' para mais informações.
+
+TYPEDEF STRUCT Q_NODE: Nó da fila, contém: Unsigned char item, int remain, struct Q_Node *next_qnode.
+
+-Funções- 
+
+Q_NODE* ENQUEUE(Q_NODE* QUEUE, UNSIGNED CHAR ITEM): Enfileira cada caractere do texto comprimido.
+
+Q_NODE* TEXT_QUEUE(FILE *READING, Q_NODE *QUEUE, HASHTABLE *HT): Reabre o arquivo original codifica cada caracte, quando um byte for preenchido adiciona na fila, no final adiciona o ultimo byte com o valor do lixo.
+
+Q_NODE* COMPRESSED_QUEUE(FILE *COPYING, Q_NODE *D_QUEUE): Armazena os caracteres no arquivo compactado numa fila.

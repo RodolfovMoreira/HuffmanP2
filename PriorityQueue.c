@@ -1,3 +1,26 @@
+/*PRIORITYQUEUE
+
+  Biblioteca de criação da fila.
+
+TYPEDEF STRUCT CHARACTER:
+Estrutura encontrada na biblioteca "PriorityQueue", contém: int code[30], int size.
+
+TYPEDEF STRUCT HASHTABLE:
+Ver biblioteca 'Hashtable' para mais informações.
+
+TYPEDEF STRUCT Q_NODE:
+Nó da fila, contém: Unsigned char item, int remain, struct Q_Node *next_qnode.
+
+-Funções-
+
+Q_NODE* ENQUEUE(Q_NODE* QUEUE, UNSIGNED CHAR ITEM):
+Enfileira cada caractere do texto comprimido.
+
+Q_NODE* TEXT_QUEUE(FILE *READING, Q_NODE *QUEUE, HASHTABLE *HT):
+Reabre o arquivo original codifica cada caracte, quando um byte for preenchido adiciona na fila, no final adiciona o ultimo byte com o valor do lixo.
+
+Q_NODE* COMPRESSED_QUEUE(FILE *COPYING, Q_NODE *D_QUEUE):
+Armazena os caracteres no arquivo compactado numa fila.*/
 #include "Huff_Library.h"
 
 typedef struct Character{

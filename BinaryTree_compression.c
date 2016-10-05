@@ -1,3 +1,25 @@
+/*BINARYTREE_COMPRESSION:
+
+ Biblioteca da árvore usada na compressão, funções que criam e auxiliam na montagem da árvore de Huffman.
+
+TYPEDEF STRUCT NODE :
+Nó que será usado na biblioteca. está estruturado em:
+Unsigned char item, int priority (ou frequência), int flag, struct Node *next_node, struct Node *previous_node, struct Node *left, struct Node *right. Nó que tem propriedades de árvore e lista.
+
+-Funções-
+
+NODE* SORT_TREE(NODE *ROOT) :
+Durante a criação da árvore, depois que os dois primeiros elementos forem somados e reinseridos na lista, a função sort_tree(root) reordenará a lista de acordo com a prioridade.
+
+NODE* MERGE_NODES(NODE *FIRST) :
+Função que recebe a lista, retira os dois primeiros elementos, soma suas prioridades e cria um galho que terá como folha os mesmos. O galho é reinserido na lista.
+
+INT TREE_SIZE(NODE *TREE, INT SIZE) :
+Função que retorna o tamanho da árvore para criação do cabeçalho.
+
+VOID PRINT_PRE_ORDER(NODE *TREE, FILE *PRINTING) :
+Imprime o a árvore no cabeçalho do arquivo compactado.*/
+
 #include "Huff_Library.h"
 
 typedef struct Node{

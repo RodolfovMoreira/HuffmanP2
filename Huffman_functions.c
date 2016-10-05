@@ -1,3 +1,63 @@
+/* 5 - HUFFMAN_FUNCTIONS:
+
+  Biblioteca que reúne as funções necessárias para compressão e descompressão, utilizando de todas as outras bibliotecas auxiliares.
+
+TYPEDEF STRUCT CHARACTER : Ver descrição na biblioteca "PriorityQueue". Estrutura encontrada na biblioteca "PriorityQueue", contém: int code[30], int size.
+
+TYPEDEF STRUCT HASHTABLE :  Ver descrição na biblioteca "Hashtable".
+
+TYPEDEF STRUCT NODE : Ver descrição na biblioteca "BinaryTree_compression".
+
+TYPEDEF STRUCT Q_NODE : Ver descrição na biblioteca "PriorityQueue".
+
+TYPEDEF STRUCT BINARYTREE : Ver descrição na biblioteca "BinaryTree_decompression".
+
+-Funções-
+
+INT SET_BIT(UNSIGNED CHAR BITS, INT POSITION) :
+Função utilizada para setar os bits da posição 'position' dada.
+
+INT IS_BIT_SET(UNSIGNED CHAR BITS, INT POSITION) :
+Função que verifica se o bit da posição 'position' está setado.
+
+VOID CHAR_FREQUENCY(FILE *COUNTING, INT *FREQUENCY) :
+Função que pega as frequências de cada caractere e armazena num array.
+
+CHARACTER* NEW_CHARACTER(INT *BYTE, INT INDEX) :
+Função que transfere o código do caractere obtido pela função 'codify' para a hashtable.
+
+VOID CODIFY(NODE *TREE, HASHTABLE *HT, INT BYTE, INT I) :
+Função que pega a codificação de cada caractere.
+Utiliza-se de recursão e tem semelhança com o algorítimo de printpreorder para obtenção dos códigos.
+Quando a função encontra um nó, ela armazena o código até agora obtido.
+
+VOID DECIMAL_TO_BINARY(INT DECIMAL, INT *BINARY, INT INDEX) :
+Transforma um número decimal em binário. (utilizada para criação do cabeçalho)
+
+VOID CREATE_HUFF(FILE *WRITING, INT *BINARY, NODE *ROOT, Q_NODE *QUEUE):
+Função que faz o cabeçalho e imprime a árvore no arquivo '.huff'
+
+NODE* UNIQUE_CHAR(NODE *ROOT) :
+Função que somente é chamada quando o arquivo a ser compactado contém somente um caractere.
+
+VOID COMPRESS():
+Função que organiza e chama todas as outras necessárias para criação do arquivo compactado.
+
+INT POWN(INT NUMBER, INT I):
+Função de calcula potências.
+
+INT SIZEOF_TRASH(Q_NODE *QUEUE):
+Função que calcula o tamanho do lixo.
+
+INT SIZEOF_TREE(Q_NODE *QUEUE):
+Função que calcula o tamanho do lixo.
+
+VOID NAVIGATE_ON_TREE(FILE *NEWOUT, BINARYTREE *ROOT, Q_NODE *QUEUE, INT SIZE):
+Função que recebe uma fila de unsigneds e vai descompactando um por um.
+
+VOID DECOMPRESS():
+Função que organiza e chama todas as outras necessárias para o arquivo ser descompactado.*/
+
 #include "Huff_Library.h"
 
 
