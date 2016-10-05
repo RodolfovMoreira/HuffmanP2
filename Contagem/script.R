@@ -1,0 +1,2 @@
+graph <- ggplot() + geom_smooth(data = linkedcomparisons, aes(linkedcomparisons$Casos, linkedcomparisons$comparações), span = 0.2, color = "red") + geom_smooth(data = treecomparisons, aes(linkedcomparisons$Casos, treecomparisons$Comparar), span = 0.2, color = "green") + labs(list(title = "Binary Search Tree v Linked List", x = "", y = "Comparisons")) + theme(plot.title = element_text(lineheight=.8, face="bold"))
+
